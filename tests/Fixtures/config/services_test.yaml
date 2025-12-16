@@ -1,0 +1,9 @@
+services:
+  Michel\PaperORM\EntityManagerInterface:
+    alias: Michel\PaperORM\EntityManager
+    public: true
+  Michel\PaperORMBundle\Command\:
+    resource: '../../../src/Command/*'
+    tags: ['console.command']
+    public: true
+    autowire: true

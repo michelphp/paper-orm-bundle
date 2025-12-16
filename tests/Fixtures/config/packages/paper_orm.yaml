@@ -1,0 +1,7 @@
+paper_orm:
+  dsn: '%env(resolve:DATABASE_URL)%'
+  debug: '%kernel.debug%'
+  logger: 'paper.logger'
+  entity_dir: '%kernel.project_dir%/src/Entity'
+  migrations_dir: '%kernel.project_dir%/migrations'
+  migrations_table: 'mig_versions'

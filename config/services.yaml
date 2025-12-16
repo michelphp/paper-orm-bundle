@@ -1,0 +1,51 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+  paper.stream_handler:
+    class: Monolog\Handler\StreamHandler
+    arguments:
+      - '%kernel.logs_dir%/paper.log'
+      - 'debug'
+
+  paper.logger:
+    class: Monolog\Logger
+    arguments:
+      - 'paper'                 # nom du channel
+      - [ '@paper.stream_handler' ]
+
+  Michel\PaperORM\Collector\EntityDirCollector:
+    factory: ['Michel\PaperORM\Collector\EntityDirCollector', 'bootstrap']
+    arguments:
+      - ['%paper_orm.entity_dir%']
+  Michel\PaperORM\PaperConfiguration:
+    factory: ['Michel\PaperORM\PaperConfiguration', 'fromDsn']
+    arguments:
+      - '%paper_orm.dsn%'
+      - '%paper_orm.debug%'
+    calls:
+          - [ withLogger, [ '@paper.logger' ] ]
+
+  Michel\PaperORM\Migration\PaperMigration:
+    factory: ['Michel\PaperORM\Migration\PaperMigration', 'create']
+    arguments:
+      - '@Michel\PaperORM\EntityManager'
+      - '%paper_orm.migrations_table%'
+      - '%paper_orm.migrations_dir%'
+
+  Michel\PaperORM\EntityManager:
+    factory: ['Michel\PaperORM\EntityManager', 'createFromConfig']
+    arguments:
+      - '@Michel\PaperORM\PaperConfiguration'
+
+  Michel\PaperORM\EntityManagerInterface:
+    alias: Michel\PaperORM\EntityManager
+    public: false
+
+  Michel\PaperORMBundle\Command\:
+    resource: '../src/Command'
+    tags: ['console.command']
+
+  Michel\PaperORMBundle\DataCollector\PaperORMCollector:
+    tags:
+      - { name: data_collector, template: '@PaperORMBundle/data_collector/template.html.twig', id: 'paper_orm' }
