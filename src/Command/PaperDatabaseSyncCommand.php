@@ -2,7 +2,6 @@
 
 namespace Michel\PaperORMBundle\Command;
 
-use http\Encoding\Stream;
 use Michel\PaperORM\Collector\EntityDirCollector;
 use Michel\PaperORM\Command\DatabaseCreateCommand;
 use Michel\PaperORM\Command\DatabaseSyncCommand;

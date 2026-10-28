@@ -11,7 +11,7 @@ use Symfony\Component\Console\Command\Command;
 final class MichelConsoleWrapper
 {
 
-    public static function executeForSymfony(CommandInterface $command, array $arguments = [], array $options = [], callable $stdout = null): int
+    public static function executeForSymfony(CommandInterface $command, array $arguments = [], array $options = [], ?callable $stdout = null): int
     {
         $app = new CommandRunner([$command]);
         $exitCode = $app->run(new CommandParser(array_merge([''], [$command->getName()], $arguments, $options)), new Output($stdout));
