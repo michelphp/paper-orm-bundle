@@ -1,21 +1,16 @@
-# 📦 PaperORMBundle
+# PaperORMBundle
 
-**PaperORMBundle** is a Symfony bundle that integrates [PaperORM](https://github.com/michelphp/paper-orm), a lightweight and performant PHP ORM.
+Symfony integration of [PaperORM](https://github.com/michelphp/paper-orm): configuration, services, console commands, profiler panel.
 
-PaperORM itself is framework-agnostic.
-This bundle provides seamless integration into Symfony: configuration via `config/packages/`, service wiring, and logger support.
+PHP 8.2+ · Symfony 5.4, 6, 7
 
----
+📖 **[Documentation](https://michelphp.github.io/paper-orm/docs.html#symfony)**
 
-## 🚀 Installation
+## Install
 
 ```bash
-composer require michel/paper-orm-bundle:0.0.1-alpha
+composer require michel/paper-orm-bundle
 ```
-
-This will install both the bundle and the core [PaperORM](https://github.com/michelphp/paper-orm).
-
-Then, enable the bundle (if Flex does not do it automatically):
 
 ```php
 // config/bundles.php
@@ -25,74 +20,36 @@ return [
 ];
 ```
 
----
-
-## ⚙️ Configuration
-
-Add your configuration in `config/packages/paper_orm.yaml`:
+## Configuration
 
 ```yaml
+# config/packages/paper_orm.yaml
 paper_orm:
   dsn: '%env(resolve:DATABASE_URL)%'
   debug: '%kernel.debug%'
-  logger: 'paper.logger'
-  entity_dir: '%kernel.project_dir%/src/Entity'
-  migrations_dir: '%kernel.project_dir%/migrations'
-  migrations_table: 'mig_versions'
 ```
 
-### Options
+| Option             | Default                           | Description                                                                 |
+|--------------------|-----------------------------------|-----------------------------------------------------------------------------|
+| `dsn`              | *(required)*                      | Database DSN, e.g. `mariadb://user:pass@127.0.0.1:3306/app`                  |
+| `debug`            | `false`                           | Record the queries, shown in the profiler                                   |
+| `logger`           | `paper.logger`                    | Service ID of a PSR-3 logger (`paper.logger` writes `var/log/paper.log`); `null` disables it |
+| `entity_dir`       | `%kernel.project_dir%/src/Entity` | Where your entities are                                                     |
+| `migrations_dir`   | `%kernel.project_dir%/migrations` | Where migration files are written                                           |
+| `migrations_table` | `mig_versions`                    | Table recording the applied migrations                                      |
+| `proxy_autoload`   | `false`                           | Set to `true` if you store loaded entities in the session                   |
 
-| Key                | Type   | Default                           | Description                                 |
-|--------------------| ------ | --------------------------------- |---------------------------------------------|
-| `dsn`              | string | *(required)*                      | Database DSN                                |
-| `debug`            | bool   | `false`                           | Enable verbose debugging                    |
-| `logger`           | string | `null`                            | Service ID of a logger (ex: `paper.logger`) |
-| `entity_dir`       | string | `%kernel.project_dir%/src/Entity` | Path to your entities                       |
-| `migrations_dir`   | string | `%kernel.project_dir%/migrations` | Path to migration files                     |
-| `migrations_table` | string | `mig_versions`                    | Table name used for migration tracking      |
-| `proxy_autoload`   | bool   | `false`                           | Enable Proxy autoload for session           |
+## What you get
 
----
+- `Michel\PaperORM\EntityManagerInterface`, ready to inject.
+- `paper:migration:diff`, `paper:migration:migrate`, `paper:database:create`, `paper:database:drop`, `paper:database:sync` in `bin/console`.
+- A profiler panel listing the queries of the request.
+- The entity manager is reset between two requests in long-running workers (FrankenPHP, RoadRunner, Messenger).
 
-## 🛠️ Services
+## Status
 
-After configuration, the following services are available in the container:
+Alpha, follows the versions of PaperORM. Issues: [github.com/michelphp/paper-orm-bundle/issues](https://github.com/michelphp/paper-orm-bundle/issues)
 
-* `Michel\PaperORM\EntityManagerInterface`
-* `Michel\PaperORM\EntityManager`
+## License
 
-You can inject them directly:
-
-```php
-use Michel\PaperORM\EntityManagerInterface;
-
-final class UserService
-{
-    public function __construct(private EntityManagerInterface $em) {}
-
-    public function createUser(string $name, string $email): void
-    {
-        $user = new User();
-        $user->setName($name)->setEmail($email);
-
-        $this->em->persist($user);
-        $this->em->flush();
-    }
-}
-```
-
----
-
-## 📖 Documentation
-
-Full ORM usage, entity mapping, and repositories are documented in the main **PaperORM** repository:
-
-👉 [PaperORM Documentation](https://github.com/michel/paper-orm)
-
----
-
-## 📌 Status
-
-This bundle is in **alpha (0.0.1-alpha)**.
-We welcome early feedback, bug reports, and contributions.
+MPL-2.0
