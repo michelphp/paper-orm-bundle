@@ -3,6 +3,8 @@
 namespace Michel\PaperORMBundle\DependencyInjection;
 
 use Michel\PaperORM\PaperConfiguration;
+use Michel\PaperORMBundle\DataCollector\PaperORMCollector;
+use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -30,6 +32,15 @@ final class PaperORMExtension extends Extension implements PrependExtensionInter
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
         $loader->load('services.yaml');
 
+        if ($config['logger'] !== null) {
+            $container->getDefinition(PaperConfiguration::class)
+                ->addMethodCall('withLogger', [new Reference($config['logger'])]);
+        }
+
+        // The collector extends a FrameworkBundle class, which the bundle does not require.
+        if (!class_exists(AbstractDataCollector::class)) {
+            $container->removeDefinition(PaperORMCollector::class);
+        }
     }
     public function prepend(ContainerBuilder $container): void
     {

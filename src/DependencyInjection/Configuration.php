@@ -24,8 +24,8 @@ final class Configuration implements ConfigurationInterface
             ->end()
 
             ->scalarNode('logger')
-            ->info('Logger service ID (set null to disable logging)')
-            ->defaultNull()
+            ->info('Logger service ID of the SQL debugger (set null to disable logging)')
+            ->defaultValue('paper.logger')
             ->end()
 
             ->scalarNode('entity_dir')

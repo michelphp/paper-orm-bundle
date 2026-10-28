@@ -18,12 +18,18 @@ class PaperORMCollector extends AbstractDataCollector
     }
     public function collect(Request $request, Response $response, ?\Throwable $exception = null) : void
     {
-        $debugger = $this->em->getConnection()->getPdo()->getSqlDebugger();
         $this->data = [
             'queries' => [],
             'count' => 0,
             'time' => 0,
         ];
+        // getPdo() connects: a request that did not use the database must not open a connection here.
+        $connection = $this->em->getConnection();
+        if (!$connection->isConnected()) {
+            return;
+        }
+
+        $debugger = $connection->getPdo()->getSqlDebugger();
         if ($debugger) {
             $this->data = [
                 'queries' => $debugger->getQueries(),

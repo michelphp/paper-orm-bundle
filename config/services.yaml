@@ -23,8 +23,7 @@ services:
     arguments:
       - '%paper_orm.dsn%'
       - '%paper_orm.debug%'
-    calls:
-          - [ withLogger, [ '@paper.logger' ] ]
+    # withLogger() is added by PaperORMExtension, from the "logger" option.
 
   Michel\PaperORM\Migration\PaperMigration:
     factory: ['Michel\PaperORM\Migration\PaperMigration', 'create']
@@ -37,6 +36,9 @@ services:
     factory: ['Michel\PaperORM\EntityManager', 'createFromConfig']
     arguments:
       - '@Michel\PaperORM\PaperConfiguration'
+    # In a long-running worker (FrankenPHP, RoadRunner, Messenger), forget the entities of the previous request.
+    tags:
+      - { name: kernel.reset, method: clear }
 
   Michel\PaperORM\EntityManagerInterface:
     alias: Michel\PaperORM\EntityManager
